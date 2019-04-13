@@ -22,7 +22,7 @@ This function uses string manipulation in the shell (not a bashism - this should
 
 <h3>create_load</h3>
 
-The main purpose of this function is to rewrite the JSON data from the API into CSV format. <code>create_load</create_load> does most of the heavy lifting by reading all output lines from the API after calling other functions to remove JSON formatting and adding sql commands to create a sql load script. There are 19 fields per record.  
+The main purpose of this function is to rewrite the JSON data from the API into CSV format. <code>create_load</code> does most of the heavy lifting by reading all output lines from the API after calling other functions to remove JSON formatting and adding sql commands to create a sql load script. There are 19 fields per record.  
 
 This function syncronizes the order of the fields adding a placeholder for the one that gets added dynamically based on workunit status.  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. By omitting the function calls to <code>create_insert</code> and <code>create_update</code> you can simply derive a plain csv file.
 
