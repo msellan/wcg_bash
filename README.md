@@ -14,11 +14,11 @@ This is a single call to the API that retrieves the number of workunits to downl
 <h3>retrieve_full_data</h3>
 
 This uses 'curl' to retrieve all available work units by using an undocumented feature of the WCG API by setting the limit
-to zero.  The API documentation specifies using 'limit' and 'offset'. I have a version that works with limit and offset as well but it is not provided here.
+to zero.  The API documentation specifies using 'limit' and 'offset'. I have a version that works with limit and offset as well but it is not provided here. If you ask in a comment, I'll upload it.
 
 <h3>parse</h3>
 
-This function uses string manipulation in the shell to parse key/value pairs assigning only the values to a variable called 'value'
+This function uses string manipulation in the shell (not a bashism - this should work in any shell) to parse key/value pairs assigning only the values to a variable called 'value'. The construct is <code>${var#*SubStr}</code> where the beginning of the string up to the substring will be dropped.  In the specific case from the code value="${line#*:}" the variable $line contains the key/value pair from the JSON separated by ':'  The key (the substring) up to and including the delimiter (':') are dropped leaving the value to be assingned to the variable $value.
 
 <h3>create_load</h3>
 
