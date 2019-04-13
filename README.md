@@ -1,4 +1,4 @@
-<img src="https://pbs.twimg.com/profile_images/448919987281866752/T4oA5jtc_400x400.png">
+<img src="https://pbs.twimg.com/profile_images/448919987281866752/T4oA5jtc_400x400.png" width="125px" height="176px">
 
 <h1>WCG_bash</h1>
 
