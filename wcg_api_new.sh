@@ -28,8 +28,8 @@ api_url="https://www.worldcommunitygrid.org/api/members/${member_name}/results?c
 
 get_results_count () {
 
-	results_count=`curl -s ${api_url} | grep -i Available | sed 's/,//' | awk -F : '{print $2}' | tr -d '"'`
-	echo ${results_count}
+	results_count=$(curl -s "${api_url}" | grep -i Available | sed 's/,//' | awk -F : '{print $2}' | tr -d '"')
+	echo "${results_count}"
 }
 
 #===========> Retrieve all work units in one pass <============
@@ -37,7 +37,7 @@ get_results_count () {
 retrieve_full_data () {
 	
 	return_limit=0
-	curl -s "${api_url}"'&Limit='${return_limit} >> "${wcgdata_file}"
+	curl -s "${api_url}"'&Limit='"${return_limit}" >> "${wcgdata_file}"
 }
 
 #===========> Parse key/values  <==============
@@ -55,7 +55,7 @@ de_json
 create_insert
 
 i=0
-while read line
+while read -r line
 do
 	if echo "${line}" | grep -qi app; then
 	
@@ -153,8 +153,7 @@ EOF
 archive_results () {
 
 	if [[ -s "${output_file}" ]]; then
-		#date_stamp=$((date +%Y-%m-%d.%H:%M:%S))
-		date_stamp=`date +%Y-%m-%d.%H:%M:%S`
+		date_stamp=$(date +%Y-%m-%d.%H:%M:%S)
 		mv "${output_file}" "${output_file}"."${date_stamp}"
 		mv "${wcgdata_file}" "${wcgdata_file}"."${date_stamp}"
 	fi
