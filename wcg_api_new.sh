@@ -126,14 +126,14 @@ mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test` (`Ap
 
 create_insert () {
 
-printf '%sINSERT INTO `wcg_work_units` (`AppName`, `ClaimedCredit`, `CpuTime`, `ElapsedTime`, `ExitStatus`, `GrantedCredit`, `DeviceId`, `DeviceName`, `ModTime`, `WorkunitId`, `ResultId`, `Name`, `Outcome`, `ReceivedTime`, `ReportDeadline`, `SentTime`, `ServerState`, `ValidateState`, `FileDeleteState`)\nVALUES\n' >> "${output_file}"
+printf 'INSERT INTO `wcg_work_units` (`AppName`, `ClaimedCredit`, `CpuTime`, `ElapsedTime`, `ExitStatus`, `GrantedCredit`, `DeviceId`, `DeviceName`, `ModTime`, `WorkunitId`, `ResultId`, `Name`, `Outcome`, `ReceivedTime`, `ReportDeadline`, `SentTime`, `ServerState`, `ValidateState`, `FileDeleteState`)\nVALUES\n' >> "${output_file}"
 }
 
 #========> Create Update <=========
 
 create_update () {
 
-printf '%sON DUPLICATE KEY UPDATE ClaimedCredit=values(ClaimedCredit),CpuTime=values(CpuTime),ElapsedTime=values(ElapsedTime),ExitStatus=values(ExitStatus),GrantedCredit=values(GrantedCredit),ModTime=values(ModTime),Outcome=values(Outcome),ReceivedTime=values(ReceivedTime),ServerState=values(ServerState),ValidateState=values(ValidateState),FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
+printf 'ON DUPLICATE KEY UPDATE ClaimedCredit=values(ClaimedCredit),CpuTime=values(CpuTime),ElapsedTime=values(ElapsedTime),ExitStatus=values(ExitStatus),GrantedCredit=values(GrantedCredit),ModTime=values(ModTime),Outcome=values(Outcome),ReceivedTime=values(ReceivedTime),ServerState=values(ServerState),ValidateState=values(ValidateState),FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
 }
 
 #======> Tidy <============
