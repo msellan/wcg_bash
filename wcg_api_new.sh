@@ -166,7 +166,7 @@ load_data () {
 	mysql --login-path=local "${dbname}" < "${output_file}"
 }
 
-#=========> Main <============
+#=========> Main Function <============
 
 main () {
 
@@ -180,6 +180,6 @@ load_data
 archive_results
 }
 
-#==========> Main <============
+#==========> Main Execution <============
 
 main
