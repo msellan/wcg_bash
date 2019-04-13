@@ -1,4 +1,4 @@
-<img src="https://www.worldcommunitygrid.org/getDynamicImage.do&imageNum=3">
+<img src="https://pbs.twimg.com/profile_images/448919987281866752/T4oA5jtc_400x400.png">
 
 <h1>WCG_bash</h1>
 
