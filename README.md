@@ -38,8 +38,7 @@ The <code>tidy</code> function performs two tasks - 1) it swaps the order of ,) 
 <h3>create_table</h3>
 
 The <code>create_table</code> function is not used directly by the script but exists to document the method used to create
-the method used for creating the 'wcg_workunits' table in the 'wcg' MySQL database. It presumes an existing MySQL instance and
-database.
+the 'wcg_workunits' table in the 'wcg' MySQL database. It presumes an existing MySQL instance and database.
 
 <h3>create_insert</h3>
 
