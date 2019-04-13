@@ -3,7 +3,7 @@
 WCG_bash is a bash script that uses the World Community Grid API to download workunit data and reprocess that data from
 JSON to CSV and then load the data into a MySQL database. This script presumes the existence of a running instance of MySQL but has a function to correctly create the table to accomodate the WCG schema. 
 
-"<b>Important:</b> It also requires that you set up your MySQL client with the MySQL config editor to allow encrypted passwordless access.  Lastly, you will need to create a script called wcg_env.sh with your WCG "member name" and WCG "Verfication Code" which can both be found on your WCG profile page.
+<b>Important:</b> It also requires that you set up your MySQL client with the MySQL config editor to allow encrypted passwordless access.  Lastly, you will need to create a script called wcg_env.sh with your WCG "member name" and WCG "Verfication Code" which can both be found on your WCG profile page.
 
 <h2>Function descriptions</h2>
 
