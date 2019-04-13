@@ -18,11 +18,13 @@ to zero.  The API documentation specifies using 'limit' and 'offset'. I have a v
 
 <h3>parse</h3>
 
-This function uses string manipulation in the shell (not a bashism - this should work in any shell) to parse key/value pairs assigning only the values to a variable called 'value'. The construct is <code>${var#*SubStr}</code> where the beginning of the string up to the substring will be dropped.  In the specific case from the code <code>value="${line#\*:}"</code> the variable $line contains the key/value pair from the JSON separated by ':'  The key (the substring) up to and including the delimiter (':') are dropped leaving the value to be assingned to the variable $value.
+This function uses string manipulation in the shell (not a bashism - this should work in any shell) to parse key/value pairs assigning only the values to a variable called 'value'. The construct is <code>${var#*SubStr}</code> where the beginning of the string up to the substring will be dropped.  In the specific case from the code <code>value="${line#\*:}"</code> the variable $line contains the key/value pair from the JSON separated by ':'  The key (the substring) up to and including the delimiter (':') are dropped leaving the value to be assigned to the variable $value.
 
 <h3>create_load</h3>
 
-Create load does most of the heavy lifting by calling other functions to remove json formatting and adding sql commands to create a sql load script. The main purpose of this function is to rewrite the JSON data from the API into CSV format.
+The main purpose of this function is to rewrite the JSON data from the API into CSV format. <code>create_load</create_load> does most of the heavy lifting by reading all output lines from the API after calling other functions to remove JSON formatting and adding sql commands to create a sql load script. There are 19 fields per record.  
+
+This function syncronizes the order of the fields adding a placeholder for the one that gets added dynamically based on workunit status.  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. By omitting the function calls to <code>create_insert</code> and <code>create_update</code> you can simply derive a plain csv file.
 
 <h3>de_json</h3>
 
