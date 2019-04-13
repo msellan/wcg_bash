@@ -16,7 +16,7 @@ to zero.  The API documentation specifies using 'limit' and 'offset'. I have a v
 
 <h3>parse</h3>
 
-This function using string manipulation in the shell to parse key/value pairs assigning only the values to a variable called 'value'
+This function uses string manipulation in the shell to parse key/value pairs assigning only the values to a variable called 'value'
 
 <h3>create_load</h3>
 
