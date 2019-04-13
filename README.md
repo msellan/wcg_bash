@@ -11,7 +11,7 @@ This is a single call to the API that retrieves the number of workunits to downl
 
 <h3>retrieve_full_data</h3>
 
-This uses 'curl' to retrieve all available work units buy using an undocumented feature of the WCG API by setting the limit
+This uses 'curl' to retrieve all available work units by using an undocumented feature of the WCG API by setting the limit
 to zero.  The API documentation specifies using 'limit' and 'offset'. I have a version that works with limit and offset as well but it is not provided here.
 
 <h3>parse</h3>
