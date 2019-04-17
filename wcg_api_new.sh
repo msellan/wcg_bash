@@ -32,7 +32,7 @@ api_url="https://www.worldcommunitygrid.org/api/members/${member_name}/results?c
 
 #----------> Get a count of results <---------------------------------
 #
-#  This fucntion is a single call to the WCG API that retrieves the
+#  This function is a single call to the WCG API that retrieves the
 #  number of workunits to download.  It is not currently in use but
 #  left for future ideas.
 #
