@@ -141,7 +141,7 @@ create_update
 
 #----------> DeJSONify data <--------------------------------------------
 #
-#  This function uses the 'ex' editor script with a heredoc to strip out
+#  This function uses an 'ex' editor script with a heredoc to strip out
 #  JSON formatting provided by the API such as curly braces and extraneous
 #  commas.
 #
@@ -161,7 +161,7 @@ EOF
 #----------> Print ENV <--------------------------------------------------
 #
 #  print_env is not used by the script but provides troubleshooting 
-#  information to see varibles that are sourced from the wcg_env.sh script.
+#  information to see variables that are sourced from the wcg_env.sh script.
 #
 #-------------------------------------------------------------------------
 
@@ -204,10 +204,10 @@ printf 'INSERT INTO `wcg_work_units` (`AppName`, `ClaimedCredit`, `CpuTime`, `El
 #----------> Crete Update <-----------------------------------------------
 #
 #  The create_update function is called by the create_load function at the
-#  end to build the UPDATE statement to update existing records in the 
-#  database. This is not a stand-alone statement but uses ON DUPLICATE KEY UPDATE
-#  as a part of the INSERT statement. The WCG "WorkunitID" is the primary
-#  key for the database.
+#  end of the data values load to build the UPDATE statement to update
+#  existing records in the database. This is not a stand-alone statement
+#  but uses ON DUPLICATE KEY UPDATE as a part of the INSERT statement. The
+#  WCG "WorkunitID" is the primary key for the database.
 #
 #--------------------------------------------------------------------------
 
@@ -218,10 +218,11 @@ printf 'ON DUPLICATE KEY UPDATE ClaimedCredit=values(ClaimedCredit),CpuTime=valu
 
 #----------> Tidy <---------------------------------------------------------
 #
-#  The tidy function performs two tasks: 1. It swaps the order of ,) to ),
-#  to correctly separate each SQL command and removes the last line of the 
-#  output file which contains an extraneous ')' in the "values" created by
-#  the create_load function.
+#  The tidy function performs two tasks: 
+#      1. It swaps the order of ,) to ), to correctly separate each SQL
+#         command.
+#      2. It removes the last line of the output file which contains an
+#         extraneous ')' in the "values" created by the create_load function.
 #
 #---------------------------------------------------------------------------
 
