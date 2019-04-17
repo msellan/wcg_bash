@@ -10,7 +10,15 @@
 #+ By Mark Sellan
 #+
 #+ March 30, 2019
+#+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Change History
+#
+#  04-16-19 - Added MySQL error checking function and incorporated 
+#	      README text from GitHub into the script body
+#
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
 #---------> Define global variables <----------------------------------
 #
