@@ -166,7 +166,21 @@ load_data () {
 	mysql --login-path=local "${dbname}" < "${output_file}"
 }
 
-#=========> Main Function <============
+#===========> Test SQL Connection <=============
+
+test_mysql () {
+
+	echo "exit" | mysql --login-path=local "${dbname}" 
+
+	if [[ $? -eq 0 ]]; then
+
+		load_data
+	else
+		logger -s -t WCG "MySQL appears to be down"
+	fi
+}
+
+#=========> Main <============
 
 main () {
 
@@ -176,10 +190,10 @@ main () {
 
 retrieve_full_data
 create_load
-load_data
+test_mysql
 archive_results
 }
 
-#==========> Main Execution <============
+#==========> Main <============
 
 main
