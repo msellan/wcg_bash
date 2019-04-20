@@ -9,13 +9,34 @@
 #+
 #+ By Mark Sellan
 #+
-#+ March 30, 2019
+#+ Created March 30, 2019
 #+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+
+#+ License
+#+
+#+ Copyright (C) 2019 Mark Sellan
+#+
+#+  This program is free software: you can redistribute it and/or modify
+#+  it under the terms of the GNU General Public License as published by
+#+  the Free Software Foundation, either version 3 of the License, or
+#+  (at your option) any later version.
+#+
+#+  This program is distributed in the hope that it will be useful,
+#+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#+  GNU General Public License for more details.
+#+
+#+  You should have received a copy of the GNU General Public License
+#+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#
 #  Change History
 #
 #  04-16-19 - Added MySQL error checking function and incorporated 
 #	      README text from GitHub into the script body
+#  04-20-19 - Added license details to script body
 #
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
