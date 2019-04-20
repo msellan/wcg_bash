@@ -9,15 +9,15 @@ JSON to CSV and then load the data into a MySQL database. This script presumes t
 
 <h2>Installation and Use</h2>
 
-Copy the script, <code> wcg_api_new.sh</code> into your home directory or subdirectory of choice and then create a file called <code>wcg_env.sh</code> and place that somewhere such as your home directory and set permisisons so that it's readly by 'owner' - chmod 600 since it contains your WCG APIkey. In that file you'll need to add lines to export varibles that are sourced by the main script at runtime. A sample looks like this:
+Copy the script, <code>wcg_api_new.sh</code> into your home directory or subdirectory of choice and then create a file called <code>wcg_env.sh</code> and place that somewhere such as your home directory and set permisisons so that it's readable only by 'owner' - chmod 600 since it contains your WCG APIkey. In that file you'll need to add lines to export variables that are sourced by the main script at runtime. A sample looks like this:
 		
-		<code> #!/bin/bash
+			#!/bin/bash
 		       
 			export dbuser="dbuser"
 			export dbpass="password"
 			export verification_code="18ad6defdadee4b3a1e33d91a67cy25c"
 			export member_name="wcg_member" 
-		</code>
+
 Strickly speaking the first two lines of the script that contain the database userID and password are not needed or used.  I keep them there for troublshooting purposes only. Database credentials are described in the next paragraph.  But you do need the last two lines.  They contain the WCG 'verification_code' and your WCG 'member_name' which you can find on your WCG 'Profile' page and are what enable you to use the WCG API.
 
 Next, you need to have access to a MySQL database. The script has a function that shows how the database table 'wcg_work_units' was created for my instance and that works with this script.  Create the table in your database.  It only has to be done once. I would suggest creating a user with limited privileges to assign to this table.  My user has 'select', 'insert', and 'update' privileges and that's it. To use the MySQL credentials in the script, you need to use the MySQL Config Editor to create an encrypted, passwordless connection.  Be sure too, to update the PATH variable in the script to include any directories you've used to install the scripts or MySQL if they are outside your current path.
