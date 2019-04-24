@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
 #+
@@ -316,6 +318,24 @@ test_mysql () {
 	fi
 }
 
+#----------> Show Usage <----------------------------------------------
+#
+#
+
+showUsage () {
+
+  echo
+  echo "usage: ${SCRIPT} [-p|-P] [-b|-B] <action> "
+  echo
+  echo "  where -p|-P = display (but not execute) requested actions"
+  echo "        -b|-B = execute in batch (quiet) mode"
+  echo
+  echo "       action = showcount|createtable"
+  echo
+  echo "  (NOTE: PREVIEW and BATCH options are mutually exclusive!)"
+  echo
+}
+
 #----------> Main functions <-------------------------------------------
 #
 #  Grouping of directly called functions used in the Main Execution
@@ -324,6 +344,44 @@ test_mysql () {
 #-----------------------------------------------------------------------
 
 main () {
+
+# Check arguments passed to script
+
+# Make sure we *any* arguments to consider
+#if [ $# -eq 0 ] && showUsage && exit -1
+#echo $#
+#if [ $# -eq 0 ]; then
+#showUsage 
+#exit -1
+#fi
+
+# First, check for PREVIEW or BATCH options
+
+#matched=`expr "$1" : '-[pPbB]'`
+#if [ $matched -gt 0 ]; then
+#   case $1 in
+#     -p|-P) PREVIEW=true ;;
+#     -b|-B) BATCH=true ;;
+#   esac
+#   shift
+#fi
+
+# Make sure we still have some more arguments to consider
+#[ $# -eq 0 ] && showUsage && exit -1
+
+# Can't have both PREVIEW *and* BATCH!
+#matched=`expr "$1" : '-[pPbB]'`
+#if [ $matched -gt 0 ]; then
+#   echo "\nerror: can't request both PREVIEW and BATCH options!\n"
+#   exit -1
+#fi
+
+#echo $#
+
+# Now, having processed optional arguments, make sure we have the proper 
+# number of "required" arguments!
+#[ $# -lt 3 ] && showUsage && exit -
+
 
 #print_env
 #create_table
@@ -342,3 +400,4 @@ archive_results
 #----------------------------------------------------------------------
 
 main
+
