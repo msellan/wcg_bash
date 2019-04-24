@@ -345,43 +345,42 @@ showUsage () {
 
 main () {
 
-# Check arguments passed to script
+#main
 
-# Make sure we *any* arguments to consider
-#if [ $# -eq 0 ] && showUsage && exit -1
-#echo $#
-#if [ $# -eq 0 ]; then
-#showUsage 
-#exit -1
-#fi
+[ $# -eq 0 ] && showusage && exit -1
 
-# First, check for PREVIEW or BATCH options
+matched=`expr "$1" : '-[pPbB]'`
 
-#matched=`expr "$1" : '-[pPbB]'`
-#if [ $matched -gt 0 ]; then
-#   case $1 in
-#     -p|-P) PREVIEW=true ;;
-#     -b|-B) BATCH=true ;;
-#   esac
-#   shift
-#fi
+if [ $matched -gt 0 ]; then
+case $1 in
+        -p|-P) preview=true;;
+        -b|-B) batch=true;;
+esac
+shift
+fi
 
-# Make sure we still have some more arguments to consider
-#[ $# -eq 0 ] && showUsage && exit -1
+[ $# -eq 0 ] && showusage && exit -1
 
-# Can't have both PREVIEW *and* BATCH!
-#matched=`expr "$1" : '-[pPbB]'`
-#if [ $matched -gt 0 ]; then
-#   echo "\nerror: can't request both PREVIEW and BATCH options!\n"
-#   exit -1
-#fi
+matched=`expr "$1" : '-[pPbB]'`
+if [ $matched -gt 0 ]; then
+echo "\nerror: can't have p and b\n"
+exit -1
+fi
 
-#echo $#
+[ $# -lt 3 ] && showusage && exit -1
 
-# Now, having processed optional arguments, make sure we have the proper 
-# number of "required" arguments!
-#[ $# -lt 3 ] && showUsage && exit -
+action=$1
 
+case $action in
+showfirst);;
+showlast);;
+showmiddle);;
+*)
+exit -1
+;;
+esac
+
+echo $action
 
 #print_env
 #create_table
