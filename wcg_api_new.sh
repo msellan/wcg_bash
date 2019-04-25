@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#set -x
-
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
 #+
@@ -39,6 +37,9 @@
 #  04-16-19 - Added MySQL error checking function and incorporated 
 #	      README text from GitHub into the script body
 #  04-20-19 - Added license details to script body
+#  04-24-19 - Corrected two rookie-like mistakes and rewrote create_load
+#	      function to use =~ bashism to replace the use of grep to
+#	      speed-up processing. 
 #
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -137,19 +138,19 @@ create_insert
 i=0
 while read -r line
 do
-	if echo "${line}" | grep -qi app; then
+	if [[ "${line}" =~ App ]]; then
 	
 		i=1
 		printf '(' >> "${output_file}"
 	fi
 	
-	if echo "${line}" | grep -qi report && [ $i == 14 ]; then
+	if [[ "${line}" =~ Report ]] && [[ $i -eq 14 ]]; then
 		
 		parse
                 printf "\"1970-01-01T00:00:00\"," >> "${output_file}"
                 printf "${value}" >> "${output_file}"
         
-	elif [ "${line}" == '' ]; then
+	elif [[ "${line}" == '' ]]; then
 	
 		printf ')' >> "${output_file}"
                 printf '\n' >> "${output_file}"
@@ -159,8 +160,8 @@ do
         fi
 
         ((i++))
-
-	if [ ${i} == 19 ]; then
+	
+	if [[ ${i} -eq 19 ]]; then
 		i=0
 	fi
 
@@ -330,7 +331,7 @@ showUsage () {
   echo "  where -p|-P = display (but not execute) requested actions"
   echo "        -b|-B = execute in batch (quiet) mode"
   echo
-  echo "       action = showcount|createtable"
+  echo "       action = getcounts|createtable"
   echo
   echo "  (NOTE: PREVIEW and BATCH options are mutually exclusive!)"
   echo
@@ -343,11 +344,11 @@ showUsage () {
 #
 #-----------------------------------------------------------------------
 
-main () {
-
 #main
 
-[ $# -eq 0 ] && showusage && exit -1
+#main () {
+
+[ $# -eq 0 ] && showUsage && exit -1
 
 matched=`expr "$1" : '-[pPbB]'`
 
@@ -359,28 +360,39 @@ esac
 shift
 fi
 
-[ $# -eq 0 ] && showusage && exit -1
+[ $# -eq 0 ] && showUsage && exit -1
 
 matched=`expr "$1" : '-[pPbB]'`
+
 if [ $matched -gt 0 ]; then
 echo "\nerror: can't have p and b\n"
 exit -1
 fi
 
-[ $# -lt 3 ] && showusage && exit -1
+[ $# -eq 0 ] && showUsage && exit -1
 
 action=$1
 
 case $action in
-showfirst);;
-showlast);;
-showmiddle);;
-*)
-exit -1
-;;
+
+	getcounts);;
+	createtable);;
+	runmain);;
+	*)
+	exit -1
+	;;
 esac
 
-echo $action
+
+if [ "${action}" == "getcounts" ]; then
+
+get_results_count
+echo $preview
+echo $batch
+
+fi
+
+if [ "${action}" == "runmain" ]; then
 
 #print_env
 #create_table
@@ -390,7 +402,22 @@ retrieve_full_data
 create_load
 test_mysql
 archive_results
-}
+echo $preview
+echo $batch
+
+fi
+
+
+
+#print_env
+#create_table
+#get_results_count
+
+#retrieve_full_data
+#create_load
+#test_mysql
+#archive_results
+#}
 
 #----------> Main Execution <------------------------------------------
 #
@@ -398,5 +425,5 @@ archive_results
 #
 #----------------------------------------------------------------------
 
-main
+#main
 
