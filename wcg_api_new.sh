@@ -1,54 +1,53 @@
 #!/bin/bash
 
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
 #+
-#+ This script uses the WCG API to download work units
-#+ for a given member and reformats the data from JSON
-#+ to CSV to load into a MySQL database.
+#+ This script uses the WCG API to download work units for a given member and
+#+ reformats the data from JSON to CSV to load into a MySQL database.
 #+
 #+ By Mark Sellan
 #+
 #+ Created March 30, 2019
 #+
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+
 #+ License
 #+
 #+ Copyright (C) 2019 Mark Sellan
 #+
-#+  This program is free software: you can redistribute it and/or modify
-#+  it under the terms of the GNU General Public License as published by
-#+  the Free Software Foundation, either version 3 of the License, or
-#+  (at your option) any later version.
+#+  This program is free software: you can redistribute it and/or modify it 
+#+  under the terms of the GNU General Public License as published by the Free
+#+  Software Foundation, either version 3 of the License, or (at your option)
+#+  any later version.
 #+
-#+  This program is distributed in the hope that it will be useful,
-#+  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#+  GNU General Public License for more details.
+#+  This program is distributed in the hope that it will be useful, but WITHOUT
+#+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#+  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License 
+#+  for more details.
 #+
-#+  You should have received a copy of the GNU General Public License
-#+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#+  You should have received a copy of the GNU General Public License along 
+#+  with this program.  If not, see <https://www.gnu.org/licenses/>.
 #+
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #
 #  Change History
 #
-#  04-16-19 - Added MySQL error checking function and incorporated 
-#	      README text from GitHub into the script body
+#  04-16-19 - Added MySQL error checking function and incorporated README text
+	      from GitHub into the script body
 #  04-20-19 - Added license details to script body
 #  04-24-19 - Corrected two rookie-like mistakes and rewrote create_load
 #	      function to use =~ bashism to replace the use of grep to
 #	      speed-up processing. 
 #
-#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
 #---------> Define global variables <-------------------------------------------
 #
-#  Setting constants and "global" variables. Stored World Community
-#  Grid "membername" and "verficationcode" in a separate script called
-#  wcg_env which is sourced here.
+#  Setting constants and "global" variables. Stored World Community Grid
+#  "membername" and "verficationcode" in a separate script called wcg_env which
+#  is sourced here.
 #
 #-------------------------------------------------------------------------------
 
@@ -64,9 +63,8 @@ api_url="https://www.worldcommunitygrid.org/api/members/${member_name}/results?c
 
 #----------> Get a count of results <-------------------------------------------
 #
-#  This function is a single call to the WCG API that retrieves the
-#  number of workunits to download.  It is not currently in use but
-#  left for future ideas.
+#  This function is a single call to the WCG API that retrieves the number of 
+#  workunits to download.  It is not currently in use but left for future ideas.
 #
 #------------------------------------------------------------------------------- 
 
@@ -79,11 +77,11 @@ get_results_count () {
 
 #----------> Retrieve all work units in one pass <------------------------------
 #
-#   This uses 'curl' to retrieve all available work units by using an
-#   undocumented feature of the WCG API by setting the limit to zero.
-#   The API documentation specifies using 'limit' and 'offset'. I have
-#   a version that works with limit and offset as well but it is not
-#   provided here. If you ask in a comment, I'll upload it.
+#   This uses 'curl' to retrieve all available work units by using an 
+#   undocumented feature of the WCG API by setting the limit to zero. The API 
+#   documentation specifies using 'limit' and 'offset'. I have a version that
+#   works with limit and offset as well but it is not provided here. If you ask
+#   in a comment, I'll upload it.
 #
 #-------------------------------------------------------------------------------
 
@@ -96,16 +94,15 @@ retrieve_full_data () {
 
 #----------> Parse keys/values <------------------------------------------------
 #
-#  This function uses string manipulation in the shell (not a bashism;
-#  this should work in any shell) to parse key/value pairs assigning 
-#  only the values to a variable called 'value'. The construct is
-#  ${var#*SubStr} where the beginning of the string up to the substring 
-#  will be dropped. 
+#  This function uses string manipulation in the shell (not a bashism; this
+#  should work in any shell) to parse key/value pairs assigning only the values
+#  to a variable called 'value'. The construct is ${var#*SubStr} where the
+#  beginning of the string up to the substring will be dropped. 
 #
-#  In the specific case from the code value="${line#*:}" 
-#  the variable $line contains the key/value pair from the JSON separated
-#  by ':' The key (the substring) up to and including the delimiter (':')
-#  are dropped leaving the value to be assigned to the variable $value.
+#  In the specific case from the code value="${line#*:}" the variable $line
+#  contains the key/value pair from the JSON separated  by ':' The key
+#  (the substring) up to and including the delimiter (':') are dropped leaving
+#  the value to be assigned to the variable $value.
 #
 #-------------------------------------------------------------------------------
 
@@ -116,18 +113,18 @@ value="${line#*:}"
 
 #----------> Create CSV SQL Load Script <---------------------------------------
 #
-#  The main purpose of this function is to rewrite the JSON data from the
-#  API into CSV format. create_load does most of the heavy lifting by reading
-#  all output lines from the API after calling other functions to remove
-#  JSON formatting and adding sql commands to create a sql load script.
-#  There are 19 fields per record.
+#  The main purpose of this function is to rewrite the JSON data from the API
+#  into CSV format. create_load does most of the heavy lifting by reading all
+#  output lines from the API after calling other functions to remove JSON
+#  formatting and adding sql commands to create a sql load script. There are 19
+#  fields per record.
 #
-#  This function syncronizes the order of the fields adding a placeholder
-#  with the Unix Epoch date for the one column that gets added dynamically
-#  based on workunit status, "Receivedtime". But mostly it coverts newlines
-#  to commas and inserts parentheses and newlines around each record. By
-#  omitting the function calls to "create_insert" and "create_update" you
-#  can simply derive a plain csv file.
+#  This function syncronizes the order of the fields adding a placeholder with
+#  the Unix Epoch date for the one column that gets added dynamically based on
+#  workunit status, "Receivedtime". But mostly it coverts newlines to commas
+#  and inserts parentheses and newlines around each record. By omitting the
+#  function calls to "create_insert" and "create_update" you can simply derive 
+#  a plain csv file.
 #
 #-------------------------------------------------------------------------------
 
@@ -174,9 +171,8 @@ create_update
 
 #----------> DeJSONify data <---------------------------------------------------
 #
-#  This function uses an 'ex' editor script with a heredoc to strip out
-#  JSON formatting provided by the API such as curly braces and extraneous
-#  commas.
+#  This function uses an 'ex' editor script with a heredoc to strip out JSON
+#  formatting provided by the API such as curly braces and extraneous commas.
 #
 #-------------------------------------------------------------------------------
 
@@ -223,9 +219,9 @@ mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test` (`Ap
 
 #----------> Create Insert <----------------------------------------------------
 #
-#  The create_insert function is called by the create_load function to 
-#  build the beginning of the SQL load script. This provides the INSERT 
-#  statement to insert new WCG workunit records into the database.
+#  The create_insert function is called by the create_load function to build
+#  the beginning of the SQL load script. This provides the INSERT statement to
+#  insert new WCG workunit records into the database.
 #
 #-------------------------------------------------------------------------------
 
@@ -236,11 +232,11 @@ printf 'INSERT INTO `wcg_work_units` (`AppName`, `ClaimedCredit`, `CpuTime`, `El
 
 #----------> Crete Update <-----------------------------------------------------
 #
-#  The create_update function is called by the create_load function at the
-#  end of the data values load to build the UPDATE statement to update
-#  existing records in the database. This is not a stand-alone statement
-#  but uses ON DUPLICATE KEY UPDATE as a part of the INSERT statement. The
-#  WCG "WorkunitID" is the primary key for the database.
+#  The create_update function is called by the create_load function at the end 
+#  of the data values load to build the UPDATE statement to update existing
+#  records in the database. This is not a stand-alone statement but uses
+#  ON DUPLICATE KEY UPDATE as a part of the INSERT statement. The WCG
+#  "WorkunitID" is the primary key for the database.
 #
 #-------------------------------------------------------------------------------
 
@@ -271,8 +267,8 @@ EOF
 
 #----------> Reset and archive <------------------------------------------------
 #
-#  The archive_results function moves the datafile returned by the WCG API
-#  and the ouput file generated by the create_load function to date/timestamped
+#  The archive_results function moves the datafile returned by the WCG API and
+#  the ouput file generated by the create_load function to date/timestamped
 #  filenames and thus clears the original names for the next run.
 #
 #-------------------------------------------------------------------------------
