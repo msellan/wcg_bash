@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
 #+
@@ -130,9 +132,6 @@ value="${line#*:}"
 
 create_load () {
 
-de_json
-create_insert
-
 i=0
 while read -r line
 do
@@ -164,9 +163,6 @@ do
 	fi
 
 done < "${wcgdata_file}"
-
-tidy
-create_update
 }
 
 #----------> DeJSONify data <---------------------------------------------------
@@ -214,7 +210,27 @@ echo "${member_name}"
 
 create_table () {
 
-mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test` (`AppName` char(30) DEFAULT NULL,`ClaimedCredit` float DEFAULT NULL,`CpuTime` float DEFAULT NULL,`ElapsedTime` float DEFAULT NULL,`ExitStatus` int(11) DEFAULT NULL,`GrantedCredit` float DEFAULT NULL,`DeviceId` int(25) DEFAULT NULL,`DeviceName` char(30) DEFAULT NULL,`ModTime` int(30) DEFAULT NULL,`WorkunitId` int(30) NOT NULL,`ResultId` int(30) DEFAULT NULL,`Name` char(255) DEFAULT NULL,`Outcome` int(11) DEFAULT NULL,`ReceivedTime` datetime DEFAULT NULL,`ReportDeadline` datetime DEFAULT NULL,`SentTime` datetime DEFAULT NULL,`ServerState` int(11) DEFAULT NULL,`ValidateState` int(11) DEFAULT NULL,`FileDeleteState` int(11) DEFAULT NULL, PRIMARY KEY (`WorkunitId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
+mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test1`
+ (`AppName` char(30) DEFAULT NULL,
+  `ClaimedCredit` float DEFAULT NULL,
+  `CpuTime` float DEFAULT NULL,
+  `ElapsedTime` float DEFAULT NULL,
+  `ExitStatus` int(11) DEFAULT NULL,
+  `GrantedCredit` float DEFAULT NULL,
+  `DeviceId` int(25) DEFAULT NULL,
+  `DeviceName` char(30) DEFAULT NULL,
+  `ModTime` int(30) DEFAULT NULL,
+  `WorkunitId` int(30) NOT NULL,
+  `ResultId` int(30) DEFAULT NULL,
+  `Name` char(255) DEFAULT NULL,
+  `Outcome` int(11) DEFAULT NULL,
+  `ReceivedTime` datetime DEFAULT NULL,
+  `ReportDeadline` datetime DEFAULT NULL,
+  `SentTime` datetime DEFAULT NULL,
+  `ServerState` int(11) DEFAULT NULL,
+  `ValidateState` int(11) DEFAULT NULL,
+  `FileDeleteState` int(11) DEFAULT NULL,
+   PRIMARY KEY (`WorkunitId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 }
 
 #----------> Create Insert <----------------------------------------------------
@@ -376,46 +392,24 @@ action=$1
 
 case $action in
 
-	getcounts);;
-	showenv);;
+	getcounts) get_results_count
+	   ;;
+	showenv) print_env
+	   ;;
 	createtable);;
-	runmain);;
+	runmain)
+	  retrieve_full_data
+	  de_json
+	  create_insert
+	  create_load
+ 	  tidy
+	  create_update	  
+	  test_mysql
+	  archive_results
+	  ;;
 	createcsv);;
 	*)
 	exit -1
 	;;
 esac
-
-
-case $action in 
-
-	getcounts) get_results_count
-		;;
-esac
-
-
-#if [ "${action}" == "runmain" ]; then
-
-#print_env
-#create_table
-#get_results_count
-
-#retrieve_full_data
-#create_load
-#test_mysql
-#archive_results
-#echo $preview
-#echo $batch
-
-#fi
-
-#}
-
-#----------> Main Execution <------------------------------------------
-#
-#  Script execution starts here
-#
-#----------------------------------------------------------------------
-
-#main
 
