@@ -36,7 +36,7 @@
 #  Change History
 #
 #  04-16-19 - Added MySQL error checking function and incorporated README text
-	      from GitHub into the script body
+#	      from GitHub into the script body
 #  04-20-19 - Added license details to script body
 #  04-24-19 - Corrected two rookie-like mistakes and rewrote create_load
 #	      function to use =~ bashism to replace the use of grep to
@@ -65,8 +65,8 @@ api_url="https://www.worldcommunitygrid.org/api/members/${member_name}/results?c
 
 #----------> Get a count of results <-------------------------------------------
 #
-#  This function is a single call to the WCG API that retrieves the number of 
-#  workunits to download.  It is not currently in use but left for future ideas.
+#  Call to the WCG API to retrieve and calculates the number of workunits to
+#  download.  It's not used except in interactive mode to display the count. 
 #
 #------------------------------------------------------------------------------- 
 
@@ -81,9 +81,7 @@ get_results_count () {
 #
 #   This uses 'curl' to retrieve all available work units by using an 
 #   undocumented feature of the WCG API by setting the limit to zero. The API 
-#   documentation specifies using 'limit' and 'offset'. I have a version that
-#   works with limit and offset as well but it is not provided here. If you ask
-#   in a comment, I'll upload it.
+#   documentation specifies using 'limit' and 'offset'. 
 #
 #-------------------------------------------------------------------------------
 
@@ -92,7 +90,6 @@ retrieve_full_data () {
 	return_limit=0
 	curl -s "${api_url}"'&Limit='"${return_limit}" >> "${wcgdata_file}"
 }
-
 
 #----------> Parse keys/values <------------------------------------------------
 #
@@ -115,18 +112,10 @@ value="${line#*:}"
 
 #----------> Create CSV SQL Load Script <---------------------------------------
 #
-#  The main purpose of this function is to rewrite the JSON data from the API
-#  into CSV format. create_load does most of the heavy lifting by reading all
-#  output lines from the API after calling other functions to remove JSON
-#  formatting and adding sql commands to create a sql load script. There are 19
-#  fields per record.
-#
-#  This function syncronizes the order of the fields adding a placeholder with
-#  the Unix Epoch date for the one column that gets added dynamically based on
-#  workunit status, "Receivedtime". But mostly it coverts newlines to commas
-#  and inserts parentheses and newlines around each record. By omitting the
-#  function calls to "create_insert" and "create_update" you can simply derive 
-#  a plain csv file.
+#  This function syncronizes the order of the fields adding a placeholder field
+#  with the Unix Epoch date to represent the WCG dynamically added column, 
+#  "Receivedtime". But mostly it coverts newlines to commas and inserts
+#  parentheses and newlines around each record. 
 #
 #-------------------------------------------------------------------------------
 
@@ -202,9 +191,9 @@ echo "${member_name}"
 
 #----------> Create MySQL table <-----------------------------------------------
 #
-#  The create_table function is not used directly by the script but exists
-#  to document the method used to create the 'wcg_workunits' table in the 
-#  'wcg' MySQL database. It presumes an existing MySQL instance and database.
+#  The create_table function is not used directly by the script but  called in
+#  interactive mode to create the 'wcg_workunits' table in a 'wcg' MySQL 
+#  database. It presumes an existing MySQL instance and database.
 #
 #-------------------------------------------------------------------------------
 
@@ -243,7 +232,26 @@ mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test1`
 
 create_insert () {
 
-printf 'INSERT INTO `wcg_work_units` (`AppName`, `ClaimedCredit`, `CpuTime`, `ElapsedTime`, `ExitStatus`, `GrantedCredit`, `DeviceId`, `DeviceName`, `ModTime`, `WorkunitId`, `ResultId`, `Name`, `Outcome`, `ReceivedTime`, `ReportDeadline`, `SentTime`, `ServerState`, `ValidateState`, `FileDeleteState`)\nVALUES\n' >> "${output_file}"
+printf 'INSERT INTO `wcg_work_units` 
+  (`AppName`,
+   `ClaimedCredit`,
+   `CpuTime`,
+   `ElapsedTime`,
+   `ExitStatus`,
+   `GrantedCredit`,
+   `DeviceId`,
+   `DeviceName`,
+   `ModTime`, 
+   `WorkunitId`,
+   `ResultId`,
+   `Name`,
+   `Outcome`,
+   `ReceivedTime`,
+   `ReportDeadline`,
+   `SentTime`,
+   `ServerState`, 
+   `ValidateState`, 
+   `FileDeleteState`)\nVALUES\n' >> "${output_file}"
 }
 
 #----------> Crete Update <-----------------------------------------------------
@@ -251,14 +259,25 @@ printf 'INSERT INTO `wcg_work_units` (`AppName`, `ClaimedCredit`, `CpuTime`, `El
 #  The create_update function is called by the create_load function at the end 
 #  of the data values load to build the UPDATE statement to update existing
 #  records in the database. This is not a stand-alone statement but uses
-#  ON DUPLICATE KEY UPDATE as a part of the INSERT statement. The WCG
-#  "WorkunitID" is the primary key for the database.
+#  ON DUPLICATE KEY UPDATE as a part of the INSERT statement. It also sets the 
+#  WCG "WorkunitID" as the primary key for the database.
 #
 #-------------------------------------------------------------------------------
 
 create_update () {
 
-printf 'ON DUPLICATE KEY UPDATE ClaimedCredit=values(ClaimedCredit),CpuTime=values(CpuTime),ElapsedTime=values(ElapsedTime),ExitStatus=values(ExitStatus),GrantedCredit=values(GrantedCredit),ModTime=values(ModTime),Outcome=values(Outcome),ReceivedTime=values(ReceivedTime),ServerState=values(ServerState),ValidateState=values(ValidateState),FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
+printf 'ON DUPLICATE KEY UPDATE 
+  ClaimedCredit=values(ClaimedCredit),
+  CpuTime=values(CpuTime),
+  ElapsedTime=values(ElapsedTime),
+  ExitStatus=values(ExitStatus),
+  GrantedCredit=values(GrantedCredit),
+  ModTime=values(ModTime),
+  Outcome=values(Outcome),
+  ReceivedTime=values(ReceivedTime),
+  ServerState=values(ServerState),
+  ValidateState=values(ValidateState),
+  FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
 }
 
 #----------> Tidy <-------------------------------------------------------------
@@ -301,8 +320,8 @@ archive_results () {
 #----------> Load Data <--------------------------------------------------------
 #
 #  The load_data function simply executes the SQL load script built by the
-#  create_load function. It is not called directly in Main but called by
-#  the test_mysql function.
+#  create_load function. It is not called directly in Main but called by the 
+#  test_mysql function.
 #
 #-------------------------------------------------------------------------------
 
@@ -313,9 +332,9 @@ load_data () {
 
 #----------> Test SQL Connection <----------------------------------------------
 #
-#  Tests the connection to MySQL by logging in to a specific database. It
-#  echos exit to ensure the test exits.  If successful it calls the 
-#  load_data function otherwise it logs the error to syslog and exits.
+#  Tests the connection to MySQL by logging in to a specific database. It echos
+#  'exit' to ensure the test exits.  If successful it calls the load_data 
+#  function otherwise it logs the error to syslog and exits.
 #
 #-------------------------------------------------------------------------------
 
@@ -350,14 +369,14 @@ showUsage () {
   echo
 }
 
-#----------> Main functions <---------------------------------------------------
+#----------> Main execution <---------------------------------------------------
 #
-#  Grouping of directly called functions used in the Main Execution
-#  body of the script.
+#  Processes commandline arguments testing for interactive mode or batch mode
+#  operation and also executes the function or set of functions required for
+#  the desired task.
 #
 #-------------------------------------------------------------------------------
 
-#main
 
 #--------->  Make sure we have some arguments <---------------------------------
 
@@ -386,7 +405,7 @@ fi
 
 #----------> Process main arguments <-------------------------------------------
 
-[ $# -eq 0 ] && showUsage && exit -1
+[[ $# -eq 0 ]] && showUsage && exit -1
 
 action=$1
 
