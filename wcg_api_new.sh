@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#set -x
-
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
 #+
@@ -41,6 +39,11 @@
 #  04-24-19 - Corrected two rookie-like mistakes and rewrote create_load
 #	      function to use =~ bashism to replace the use of grep to
 #	      speed-up processing. 
+#  04-26-19   Added parameterization with a case statement to allow individial
+#  	      functions to be called at run time either in an interactive mode
+#      	      or in a batch mode.
+#  04-27-19   Rewrote create_load to consolidate create_insert and create_update
+#  	      functions and made tweaks to the 'tidy' function.
 #
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -121,6 +124,27 @@ value="${line#*:}"
 
 create_load () {
 
+printf 'INSERT INTO `wcg_work_units` 
+  (`AppName`,
+   `ClaimedCredit`,
+   `CpuTime`,
+   `ElapsedTime`,
+   `ExitStatus`,
+   `GrantedCredit`,
+   `DeviceId`,
+   `DeviceName`,
+   `ModTime`, 
+   `WorkunitId`,
+   `ResultId`,
+   `Name`,
+   `Outcome`,
+   `ReceivedTime`,
+   `ReportDeadline`,
+   `SentTime`,
+   `ServerState`, 
+   `ValidateState`, 
+   `FileDeleteState`)\nVALUES\n' >> "${output_file}"
+
 i=0
 while read -r line
 do
@@ -152,6 +176,21 @@ do
 	fi
 
 done < "${wcgdata_file}"
+
+tidy
+
+printf 'ON DUPLICATE KEY UPDATE 
+  ClaimedCredit=values(ClaimedCredit),
+  CpuTime=values(CpuTime),
+  ElapsedTime=values(ElapsedTime),
+  ExitStatus=values(ExitStatus),
+  GrantedCredit=values(GrantedCredit),
+  ModTime=values(ModTime),
+  Outcome=values(Outcome),
+  ReceivedTime=values(ReceivedTime),
+  ServerState=values(ServerState),
+  ValidateState=values(ValidateState),
+  FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
 }
 
 #----------> DeJSONify data <---------------------------------------------------
@@ -168,6 +207,7 @@ de_json () {
 	g/{/s///g
 	g/}/s///g
 	g/^,/s//g
+	g/]/s///g
 	wq!
 EOF
 }
@@ -222,64 +262,6 @@ mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test1`
    PRIMARY KEY (`WorkunitId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 }
 
-#----------> Create Insert <----------------------------------------------------
-#
-#  The create_insert function is called by the create_load function to build
-#  the beginning of the SQL load script. This provides the INSERT statement to
-#  insert new WCG workunit records into the database.
-#
-#-------------------------------------------------------------------------------
-
-create_insert () {
-
-printf 'INSERT INTO `wcg_work_units` 
-  (`AppName`,
-   `ClaimedCredit`,
-   `CpuTime`,
-   `ElapsedTime`,
-   `ExitStatus`,
-   `GrantedCredit`,
-   `DeviceId`,
-   `DeviceName`,
-   `ModTime`, 
-   `WorkunitId`,
-   `ResultId`,
-   `Name`,
-   `Outcome`,
-   `ReceivedTime`,
-   `ReportDeadline`,
-   `SentTime`,
-   `ServerState`, 
-   `ValidateState`, 
-   `FileDeleteState`)\nVALUES\n' >> "${output_file}"
-}
-
-#----------> Crete Update <-----------------------------------------------------
-#
-#  The create_update function is called by the create_load function at the end 
-#  of the data values load to build the UPDATE statement to update existing
-#  records in the database. This is not a stand-alone statement but uses
-#  ON DUPLICATE KEY UPDATE as a part of the INSERT statement. It also sets the 
-#  WCG "WorkunitID" as the primary key for the database.
-#
-#-------------------------------------------------------------------------------
-
-create_update () {
-
-printf 'ON DUPLICATE KEY UPDATE 
-  ClaimedCredit=values(ClaimedCredit),
-  CpuTime=values(CpuTime),
-  ElapsedTime=values(ElapsedTime),
-  ExitStatus=values(ExitStatus),
-  GrantedCredit=values(GrantedCredit),
-  ModTime=values(ModTime),
-  Outcome=values(Outcome),
-  ReceivedTime=values(ReceivedTime),
-  ServerState=values(ServerState),
-  ValidateState=values(ValidateState),
-  FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
-}
-
 #----------> Tidy <-------------------------------------------------------------
 #
 #  The tidy function performs two tasks: 
@@ -295,7 +277,7 @@ tidy () {
 	ex "${output_file}" <<EOF
 	g/,)/s/,)/),/g
 	$
-	-1,.d
+	-2,.d
 	wq!
 EOF
 }
@@ -320,8 +302,7 @@ archive_results () {
 #----------> Load Data <--------------------------------------------------------
 #
 #  The load_data function simply executes the SQL load script built by the
-#  create_load function. It is not called directly in Main but called by the 
-#  test_mysql function.
+#  create_load function. 
 #
 #-------------------------------------------------------------------------------
 
@@ -419,10 +400,7 @@ case $action in
 	runmain)
 	  retrieve_full_data
 	  de_json
-	  create_insert
 	  create_load
- 	  tidy
-	  create_update	  
 	  test_mysql
 	  archive_results
 	  ;;

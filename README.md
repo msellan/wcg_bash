@@ -41,9 +41,9 @@ This function uses string manipulation in the shell (not a bashism - this should
 
 <h3>create_load</h3>
 
-The main purpose of this function is to rewrite the JSON data from the API into CSV format. <code>create_load</code> does most of the heavy lifting by reading all output lines from the API after calling other functions to remove JSON formatting and adding sql commands to create a sql load script. There are 19 fields per record.  
+The <code>create_load</code> does most of the heavy lifting by reading all output lines from the API after calling other functions to remove JSON formatting and adding sql commands to create a sql load script. There are 19 fields per record.  
 
-This function syncronizes the order of the fields adding a placeholder for the one column that gets added dynamically based on workunit status, "Receivedtime".  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. By omitting the function calls to <code>create_insert</code> and <code>create_update</code> you can simply derive a plain csv file.
+This function syncronizes the order of the fields adding a placeholder for the one column that gets added dynamically based on workunit status, "Receivedtime".  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. 
 
 <h3>de_json</h3>
 
@@ -55,16 +55,7 @@ The <code>tidy</code> function performs two tasks - 1) it swaps the order of ,) 
 
 <h3>create_table</h3>
 
-The <code>create_table</code> function is not used directly by the script but exists to document the method used to create
-the 'wcg_workunits' table in the 'wcg' MySQL database. It presumes an existing MySQL instance and database.
-
-<h3>create_insert</h3>
-
-The <code>create_insert</code> function is called by the <code>create_load</code> function to build the beginning of the SQL load script.  This provides the INSERT to insert new records into the database.
-
-<h3>create_update</h3>
-
-The <code>create_update</code> function is called by the <code>create_load</code> function at the end to build the UPDATE statement to update existing records in the database.  This is not a stand-alone statement but uses ON DUPLICATE KEY UPDATE as a part of the INSERT statement. The WCG "WorkunitID" is the primary key for the database.
+The <code>create_table</code> function is not used directly by the script but can be called in interactive mode aand used to create the 'wcg_workunits' table in the 'wcg' MySQL database. It presumes an existing MySQL instance and database.
 
 <h3>print_env</h3>
 
