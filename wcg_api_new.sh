@@ -129,6 +129,8 @@ parse () {
 
 create_load () {
 
+    if [[ "${action}" == "runmain" ]];then
+
     printf 'INSERT INTO `wcg_work_units` 
         (`AppName`,
         `ClaimedCredit`,
@@ -149,6 +151,8 @@ create_load () {
         `ServerState`, 
         `ValidateState`, 
         `FileDeleteState`)\nVALUES\n' >> "${output_file}"
+    fi	
+
 
     i=0
     while read -r line
@@ -156,7 +160,10 @@ create_load () {
         if [[ "${line}" =~ App ]]; then
 
             i=1
-            printf '(' >> "${output_file}"
+            if [[ "${action}" == "runmain" ]];then
+	    
+                printf '(' >> "${output_file}"
+	    fi
         fi
 	
         if [[ "${line}" =~ Report ]] && [[ $i -eq 14 ]]; then
@@ -167,7 +174,9 @@ create_load () {
     
         elif [[ "${line}" == '' ]]; then
 
-            printf ')' >> "${output_file}"
+            if [[ "${action}" == "runmain" ]];then
+                printf ')' >> "${output_file}"
+	    fi
             printf '\n' >> "${output_file}"
         else
             parse
@@ -183,6 +192,8 @@ create_load () {
     done < "${wcgdata_file}"
 
     tidy
+    
+    if [[ "${action}" == "runmain" ]];then
 
     printf 'ON DUPLICATE KEY UPDATE 
         ClaimedCredit=values(ClaimedCredit),
@@ -196,6 +207,7 @@ create_load () {
         ServerState=values(ServerState),
         ValidateState=values(ValidateState),
         FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
+    fi
 }
 
 #----------> DeJSONify data <---------------------------------------------------
@@ -418,10 +430,14 @@ case $action in
 	  retrieve_full_data
 	  de_json
 	  create_load
-	  test_mysql
-	  archive_results
+#	  test_mysql
+#	  archive_results
 	  ;;
-	createcsv);;
+	createcsv)
+	  retrieve_full_data
+	  de_json
+	  create_load
+	  ;;
 	showusage) showUsage
 	  ;;
 	*)
