@@ -430,8 +430,8 @@ case $action in
 	  retrieve_full_data
 	  de_json
 	  create_load
-#	  test_mysql
-#	  archive_results
+	  test_mysql
+	  archive_results
 	  ;;
 	createcsv)
 	  retrieve_full_data
