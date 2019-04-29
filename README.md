@@ -1,8 +1,7 @@
 <img src="https://pbs.twimg.com/profile_images/448919987281866752/T4oA5jtc_400x400.png" width="125px" height="125px">
 <h1>WCG_bash</h1> 
 
-WCG_bash is a bash script that uses the World Community Grid API to download workunit data and reprocess that data from
-JSON to CSV and then load the data into a MySQL database. This script presumes the existence of a running instance of MySQL but provides a function to correctly create the table to accomodate the WCG schema. 
+WCG_bash is a bash script that uses the World Community Grid API to download workunit data and reprocess that data from JSON to CSV and then load the data into a MySQL database. This script presumes the existence of a running instance of MySQL but provides a function to correctly create the table to accomodate the WCG schema. 
 
 <b>Important:</b> It also requires that you set up your MySQL client with the MySQL Config Editor to allow encrypted passwordless access.  Lastly, you will need to create a script called wcg_env.sh with your WCG "member name" and WCG "Verfication Code" which can both be found on your WCG profile page.
 
@@ -24,16 +23,18 @@ Next, you need to have access to a MySQL database. The script has a function tha
 
 Make sure the script itself is executable with a <code> chmod 755 wcg_api_new.sh</code> or 750 or 700 based on your preferences.  Execute the script by running it on the command line or by calling in through 'cron' if you want to run it on a schedule.
 
+You can also use the script to simply generate a CSV file and not load the contents to a database. Specify "-createcsv" at runtime in either interactive or batch mode and the output file will be a CSV file instead of a SQL load script.
+
+
 <h2>Function descriptions</h2>
 
 <h3>get_results_count</h3>
 
-This is a single call to the API that retrieves the number of workunits to download.  It is not currently in use but was made available for future ideas.
+This is a single call to the API that retrieves the number of workunits to download. It is not used directly by the script but can be called at runtime with "-getcounts" in interactive mode only.
 
 <h3>retrieve_full_data</h3>
 
-This uses 'curl' to retrieve all available work units by using an undocumented feature of the WCG API by setting the limit
-to zero.  The API documentation specifies using 'limit' and 'offset'. I have a version that works with limit and offset as well but it is not provided here. If you ask in a comment, I'll upload it.
+This uses 'curl' to retrieve all available work units by using an undocumented feature of the WCG API by setting the limit to zero.  The API documentation specifies using 'limit' and 'offset'. I have a version that works with limit and offset as well but it is not provided here. If you ask in a comment, I'll upload it.
 
 <h3>parse</h3>
 
@@ -43,7 +44,9 @@ This function uses string manipulation in the shell (not a bashism - this should
 
 The <code>create_load</code> does most of the heavy lifting by reading all output lines from the API after calling other functions to remove JSON formatting and adding sql commands to create a sql load script. There are 19 fields per record.  
 
-This function syncronizes the order of the fields adding a placeholder for the one column that gets added dynamically based on workunit status, "Receivedtime".  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. 
+This function synchronizes the order of the fields adding a placeholder for the one column that gets added dynamically based on workunit status, "Receivedtime".  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. 
+
+NOTE:  You an derive a plain CSV file instead of a SQL load script by passing "-createcsv" as an argument at runtime.
 
 <h3>de_json</h3>
 
@@ -59,7 +62,7 @@ The <code>create_table</code> function is not used directly by the script but ca
 
 <h3>print_env</h3>
 
-<code>print_env</code> is not used by the script but provides a troubleshooting tool to see varibles that are sourced from the wcg_env.sh script.
+<code>print_env</code> is not used by the script but provides a troubleshooting tool to see varibles that are sourced from the wcg_env.sh script. It can be called at runtime with "-showenv" in interactive mode.
 
 <h3>load_data</h3>
 
