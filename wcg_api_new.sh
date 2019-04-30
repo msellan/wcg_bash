@@ -414,10 +414,11 @@ fi
 [[ $# -eq 0 ]] && show_usage && exit 1
 
 matched=$(expr "$1" : '-[iIbB]')
+echo "the value of matched is: $matched"
 
-if [[ $matched -gt 0 ]]; then
-echo "\nerror: can't have i and b\n"
-exit 1
+if [[ $matched -gt 1 ]]; then
+	echo "\nerror: can't have i and b\n"
+	exit 1
 fi
 
 #----------> Process main arguments <-------------------------------------------
