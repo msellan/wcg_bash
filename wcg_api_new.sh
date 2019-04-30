@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -xeuo pipefail
+
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
 #+
@@ -59,12 +61,12 @@
 source ~/wcg_env.sh
 
 PATH="${PATH}":~/Downloads:/usr/bin:/Applications/MAMP/Library/bin
-output_format=json
-data_dir=~/Downloads
-wcgdata_file="${data_dir}/wcgdata.dat"
-dbname=wcg
-output_file="${data_dir}/csv_out.dat"
-api_url="https://www.worldcommunitygrid.org/api/members/${member_name}/results?code=${verification_code}&format=${output_format}"
+OUTPUT_FORMAT=json
+DATA_DIR=~/Downloads
+WCGDATA_FILE="${DATA_DIR}/wcgdata.dat"
+DBNAME=wcg
+OUTPUT_FILE="${DATA_DIR}/csv_out.dat"
+API_URL="https://www.worldcommunitygrid.org/api/members/${member_name}/results?code=${verification_code}&format=${OUTPUT_FORMAT}"
 
 #----------> Get a count of results <-------------------------------------------
 #
@@ -76,12 +78,12 @@ api_url="https://www.worldcommunitygrid.org/api/members/${member_name}/results?c
 get_results_count () {
 
     if [[ "${interactive}" == true ]]; then
-        results_count=$(curl -s "${api_url}" | grep -i Available \
+        results_count=$(curl -s "${API_URL}" | grep -i Available \
         | sed 's/,//' | awk -F : '{print $2}' | tr -d '"')
         echo "${results_count}"
     else
         echo "Sorry this function is only available in interactive mode"
-        exit -1
+        exit 1
     fi
 }
 
@@ -96,7 +98,7 @@ get_results_count () {
 retrieve_full_data () {
 	
     return_limit=0
-    curl -s "${api_url}"'&Limit='"${return_limit}" >> "${wcgdata_file}"
+    curl -s "${API_URL}"'&Limit='"${return_limit}" >> "${WCGDATA_FILE}"
 }
 
 #----------> Parse keys/values <------------------------------------------------
@@ -150,7 +152,7 @@ create_load () {
         `SentTime`,
         `ServerState`, 
         `ValidateState`, 
-        `FileDeleteState`)\nVALUES\n' >> "${output_file}"
+        `FileDeleteState`)\nVALUES\n' >> "${OUTPUT_FILE}"
     fi	
 
 
@@ -162,25 +164,25 @@ create_load () {
             i=1
             if [[ "${action}" == "runmain" ]];then
 	    
-                printf '(' >> "${output_file}"
+                printf '(' >> "${OUTPUT_FILE}"
 	    fi
         fi
 	
         if [[ "${line}" =~ Report ]] && [[ $i -eq 14 ]]; then
 		
             parse
-            printf "\"1970-01-01T00:00:00\"," >> "${output_file}"
-            printf "${value}" >> "${output_file}"
+            printf "\"1970-01-01T00:00:00\"," >> "${OUTPUT_FILE}"
+            printf "${value}" >> "${OUTPUT_FILE}"
     
         elif [[ "${line}" == '' ]]; then
 
             if [[ "${action}" == "runmain" ]];then
-                printf ')' >> "${output_file}"
+                printf ')' >> "${OUTPUT_FILE}"
 	    fi
-            printf '\n' >> "${output_file}"
+            printf '\n' >> "${OUTPUT_FILE}"
         else
             parse
-            printf "${value}" >> "${output_file}"
+            printf "${value}" >> "${OUTPUT_FILE}"
         fi
 
         ((i++))
@@ -189,7 +191,7 @@ create_load () {
             i=0
         fi
 
-    done < "${wcgdata_file}"
+    done < "${WCGDATA_FILE}"
 
     tidy
     
@@ -206,7 +208,7 @@ create_load () {
         ReceivedTime=values(ReceivedTime),
         ServerState=values(ServerState),
         ValidateState=values(ValidateState),
-        FileDeleteState=values(FileDeleteState);\n' >> "${output_file}"
+        FileDeleteState=values(FileDeleteState);\n' >> "${OUTPUT_FILE}"
     fi
 }
 
@@ -219,7 +221,7 @@ create_load () {
 
 de_json () {
 
-    ex "${wcgdata_file}" <<EOF
+    ex "${WCGDATA_FILE}" <<EOF
         1,6d
         g/{/s///g
         g/}/s///g
@@ -258,7 +260,7 @@ create_table () {
 
     if [[ "${interactive}" == true ]]; then
 
-        mysql --login-path=local "${dbname}" -e 'CREATE TABLE `wcg_work_units_test2`
+        mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
         (`AppName` char(30) DEFAULT NULL,
         `ClaimedCredit` float DEFAULT NULL,
         `CpuTime` float DEFAULT NULL,
@@ -281,7 +283,7 @@ create_table () {
          PRIMARY KEY (`WorkunitId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
     else
         echo "Sorry this function is only available in interactive mode"
-        exit -1
+        exit 1
     fi
 }
 
@@ -297,7 +299,7 @@ create_table () {
 
 tidy () {
 	
-    ex "${output_file}" <<EOF
+    ex "${OUTPUT_FILE}" <<EOF
         g/,)/s/,)/),/g
         $
         -2,.d
@@ -315,10 +317,10 @@ EOF
 
 archive_results () {
 
-    if [[ -s "${output_file}" ]]; then
+    if [[ -s "${OUTPUT_FILE}" ]]; then
 	date_stamp=$(date +%Y-%m-%d.%H:%M:%S)
-	mv "${output_file}" "${output_file}"."${date_stamp}"
-	mv "${wcgdata_file}" "${wcgdata_file}"."${date_stamp}"
+	mv "${OUTPUT_FILE}" "${OUTPUT_FILE}"."${date_stamp}"
+	mv "${WCGDATA_FILE}" "${WCGDATA_FILE}"."${date_stamp}"
     fi
 }
 
@@ -331,7 +333,7 @@ archive_results () {
 
 load_data () {
 
-    mysql --login-path=local "${dbname}" < "${output_file}"
+    mysql --login-path=local "${DBNAME}" < "${OUTPUT_FILE}"
 
 }
 
@@ -345,7 +347,7 @@ load_data () {
 
 test_mysql () {
 
-    echo "exit" | mysql --login-path=local "${dbname}" 
+    echo "exit" | mysql --login-path=local "${DBNAME}" 
 
     if [[ $? -eq 0 ]]; then
 
@@ -357,6 +359,12 @@ test_mysql () {
 
 }
 
+die () {
+
+    echo $1
+    exit 1
+}
+
 #----------> Show Usage <-------------------------------------------------------
 #
 #  Shows usage and can be called from the command line or will be displayed
@@ -364,7 +372,7 @@ test_mysql () {
 #
 #-------------------------------------------------------------------------------
 
-showUsage () {
+show_usage () {
 
   echo
   echo "usage: ${SCRIPT} [-i|-I] [-b|-B] <action> "
@@ -389,9 +397,9 @@ showUsage () {
 
 #--------->  Make sure we have some arguments <---------------------------------
 
-[[ $# -eq 0 ]] && showUsage && exit -1
+[[ $# -eq 0 ]] && show_usage && exit 1
 
-matched=`expr "$1" : '-[iIbB]'`
+matched=$(expr "$1" : '-[iIbB]')
 
 if [[ $matched -gt 0 ]]; then
 case $1 in
@@ -403,18 +411,18 @@ fi
 
 #----------> Make sure interactive and batch aren't both selected <-------------
 
-[[ $# -eq 0 ]] && showUsage && exit -1
+[[ $# -eq 0 ]] && show_usage && exit 1
 
-matched=`expr "$1" : '-[iIbB]'`
+matched=$(expr "$1" : '-[iIbB]')
 
 if [[ $matched -gt 0 ]]; then
 echo "\nerror: can't have i and b\n"
-exit -1
+exit 1
 fi
 
 #----------> Process main arguments <-------------------------------------------
 
-[[ $# -eq 0 ]] && showUsage && exit -1
+[[ $# -eq 0 ]] && show_usage && exit 1
 
 action=$1
 
@@ -427,21 +435,21 @@ case $action in
 	createtable) create_table
  	   ;;
 	runmain)
-	  retrieve_full_data
-	  de_json
-	  create_load
-	  test_mysql
-	  archive_results
+	  retrieve_full_data || die
+	  de_json || die
+	  create_load || die
+	  test_mysql || die
+	  archive_results || die
 	  ;;
 	createcsv)
 	  retrieve_full_data
 	  de_json
 	  create_load
 	  ;;
-	showusage) showUsage
+	showusage) show_usage
 	  ;;
 	*)
-	exit -1
-	;;
+	exit 1
+   	  ;;
 esac
 
