@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -xeuo pipefail
+set -xeuo pipefail
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
