@@ -131,7 +131,7 @@ parse () {
 
 create_load () {
 
-    if [[ "${action}" == "runmain" ]];then
+    if [[ "${action}" == "l" ]];then
 
     printf 'INSERT INTO `wcg_work_units` 
         (`AppName`,
@@ -162,7 +162,7 @@ create_load () {
         if [[ "${line}" =~ App ]]; then
 
             i=1
-            if [[ "${action}" == "runmain" ]];then
+            if [[ "${action}" == "l" ]];then
 	    
                 printf '(' >> "${OUTPUT_FILE}"
 	    fi
@@ -176,7 +176,7 @@ create_load () {
     
         elif [[ "${line}" == '' ]]; then
 
-            if [[ "${action}" == "runmain" ]];then
+            if [[ "${action}" == "l" ]];then
                 printf ')' >> "${OUTPUT_FILE}"
 	    fi
             printf '\n' >> "${OUTPUT_FILE}"
@@ -195,7 +195,7 @@ create_load () {
 
     tidy
     
-    if [[ "${action}" == "runmain" ]];then
+    if [[ "${action}" == "l" ]];then
 
     printf 'ON DUPLICATE KEY UPDATE 
         ClaimedCredit=values(ClaimedCredit),
@@ -258,7 +258,7 @@ print_env () {
 
 create_table () {
 
-    if [[ "${interactive}" == true ]]; then
+   # if [[ "${interactive}" == true ]]; then
 
         mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
         (`AppName` char(30) DEFAULT NULL,
@@ -281,10 +281,10 @@ create_table () {
         `ValidateState` int(11) DEFAULT NULL,
         `FileDeleteState` int(11) DEFAULT NULL,
          PRIMARY KEY (`WorkunitId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
-    else
-        echo "Sorry this function is only available in interactive mode"
-        exit 1
-    fi
+   # else
+   #     echo "Sorry this function is only available in interactive mode"
+   #     exit 1
+   # fi
 }
 
 #----------> Tidy <-------------------------------------------------------------
