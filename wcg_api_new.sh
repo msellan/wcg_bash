@@ -46,6 +46,11 @@
 #      	      or in a batch mode.
 #  04-27-19   Rewrote create_load to consolidate create_insert and create_update
 #  	      functions and made tweaks to the 'tidy' function.
+#  04-29-19   Changed argument processing to use GETOPTS bash built-in and added
+#             code to allow the creation of a CSV file instead of a databse
+#             load.
+#  05-01-19   Changed usage statement to reflect new options given changes from
+#             4/29 for parameter processing.
 #
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -374,15 +379,32 @@ die () {
 
 show_usage () {
 
+  tput clear
+
+  echo "WCG_Bash is a script that processes workunit data via the World Community"
+  echo "Grid API.  The script provides functionality to count pending data, to"
+  echo "download work units into a CSV format, or to load the data into a MySQL"
+  echo "database."
   echo
-  echo "usage: ${SCRIPT} [-i|-I] [-b|-B] <action> "
+  echo  	"usage: ${SCRIPT} <action> "
   echo
-  echo "  where -i|-I = run interactively "
-  echo "        -b|-B = process in batch mode"
-  echo
-  echo "       action = getcounts|createtable"
-  echo
-  echo "  (NOTE: PREVIEW and BATCH options are mutually exclusive!)"
+  echo 		"The \"action\" options are as follows:"
+  echo  
+  echo 			" -g    Get the count of workunits available for"
+  echo			"       download"
+  echo 			" -e    Show the environment variables that are sourced"
+  echo                  " 	by the wcg_env.sh script."
+  echo			" -t    Create a table using the default database, \"wcg\""
+  echo 			" -l    Load the downloaded work units into the MySQL"
+  echo                  "       database that's been configured."
+  echo 			" -c    Create a CSV file of the current workunits. This "
+  echo                  "       does not load the data into a database but merely"
+  echo                  "       saves the output to the default output file."
+  echo 			" -s    Shows this usage statement"
+  echo 			" -i    Sets interactive mode" 
+  echo 			" -b    Sets batch mode" 
+  echo 
+  echo 		"  (NOTE: PREVIEW and BATCH options are mutually exclusive!)"
   echo
 }
 
