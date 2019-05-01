@@ -260,7 +260,8 @@ create_table () {
 
     if [[ "${interactive}" == true ]]; then
 
-        mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
+        #mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
+        mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE "${TABLE}"
         (`AppName` char(30) DEFAULT NULL,
         `ClaimedCredit` float DEFAULT NULL,
         `CpuTime` float DEFAULT NULL,
@@ -395,62 +396,40 @@ show_usage () {
 #-------------------------------------------------------------------------------
 
 
-#--------->  Make sure we have some arguments <---------------------------------
-
-[[ $# -eq 0 ]] && show_usage && exit 1
-
-matched=$(expr "$1" : '-[iIbB]')
-
-if [[ $matched -gt 0 ]]; then
-case $1 in
-        -i|-I) interactive=true;;
-        -b|-B) batch=true;;
-esac
-shift
-fi
-
-#----------> Make sure interactive and batch aren't both selected <-------------
-
-[[ $# -eq 0 ]] && show_usage && exit 1
-
-matched=$(expr "$1" : '-[iIbB]')
-echo "the value of matched is: $matched"
-
-if [[ $matched -gt 1 ]]; then
-	echo "\nerror: can't have i and b\n"
-	exit 1
-fi
-
 #----------> Process main arguments <-------------------------------------------
 
-[[ $# -eq 0 ]] && show_usage && exit 1
+while getopts 'gibeld:cst:' action; do
+case "${action}" in
 
-action=$1
-
-case $action in
-
-	getcounts) get_results_count
-	   ;;
-	showenv) print_env
-	   ;;
-	createtable) create_table
- 	   ;;
-	runmain)
-	  retrieve_full_data || die
-	  de_json || die
-	  create_load || die
-	  test_mysql || die
-	  archive_results || die
-	  ;;
-	createcsv)
-	  retrieve_full_data
-	  de_json
-	  create_load
-	  ;;
-	showusage) show_usage
-	  ;;
-	*)
-	exit 1
-   	  ;;
+	   g) get_results_count
+	      ;;
+    	   e) print_env
+	      ;;
+    	   t) TABLE="${OPTARG}"
+              echo $TABLE
+              create_table
+ 	      ;;
+       	   l)
+	      retrieve_full_data || die
+	      de_json || die
+	      create_load || die
+	      test_mysql || die
+	      archive_results || die
+	      ;;
+	   c)
+	      retrieve_full_data
+	      de_json
+	      create_load
+	      ;;
+	   s) show_usage
+	      ;;
+           i) interactive=true
+              ;;
+           b) batch=true
+              ;;
+	   *) show_usage
+	      exit 1
+   	      ;;
 esac
 
+done
