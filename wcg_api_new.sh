@@ -260,8 +260,7 @@ create_table () {
 
     if [[ "${interactive}" == true ]]; then
 
-        #mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
-        mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE "${TABLE}"
+        mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
         (`AppName` char(30) DEFAULT NULL,
         `ClaimedCredit` float DEFAULT NULL,
         `CpuTime` float DEFAULT NULL,
