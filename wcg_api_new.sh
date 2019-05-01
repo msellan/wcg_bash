@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xeuo pipefail
+set -euo pipefail
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #+ World Community Grid Data Processing Script
@@ -67,6 +67,7 @@ source ~/wcg_env.sh
 
 PATH="${PATH}":~/Downloads:/usr/bin:/Applications/MAMP/Library/bin
 OUTPUT_FORMAT=json
+SCRIPT=$(basename $0)
 DATA_DIR=~/Downloads
 WCGDATA_FILE="${DATA_DIR}/wcgdata.dat"
 DBNAME=wcg
