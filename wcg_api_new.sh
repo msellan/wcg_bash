@@ -76,21 +76,16 @@ API_URL="https://www.worldcommunitygrid.org/api/members/${member_name}/results?c
 
 #----------> Get a count of results <-------------------------------------------
 #
-#  Call to the WCG API to retrieve and calculates the number of workunits to
+#  Call to the WCG API to retrieve and calculate the number of workunits to
 #  download.  It's not used except in interactive mode to display the count. 
 #
 #------------------------------------------------------------------------------- 
 
 get_results_count () {
 
-    if [[ "${interactive}" == true ]]; then
         results_count=$(curl -s "${API_URL}" | grep -i Available \
         | sed 's/,//' | awk -F : '{print $2}' | tr -d '"')
         echo "${results_count}"
-    else
-        echo "Sorry this function is only available in interactive mode"
-        exit 1
-    fi
 }
 
 #----------> Retrieve all work units in one pass <------------------------------
@@ -256,15 +251,13 @@ print_env () {
 
 #----------> Create MySQL table <-----------------------------------------------
 #
-#  The create_table function is not used directly by the script but  called in
-#  interactive mode to create the 'wcg_workunits' table in a 'wcg' MySQL 
-#  database. It presumes an existing MySQL instance and database.
+#  The create_table function is not used directly by the script but can be  
+#  called to create the 'wcg_workunits' table in a 'wcg' MySQL database. It
+#  presumes an existing MySQL instance and database.
 #
 #-------------------------------------------------------------------------------
 
 create_table () {
-
-    if [[ "${interactive}" == true ]]; then
 
         mysql --login-path=local "${DBNAME}" -e 'CREATE TABLE `wcg_work_units_test2`
         (`AppName` char(30) DEFAULT NULL,
@@ -287,10 +280,6 @@ create_table () {
         `ValidateState` int(11) DEFAULT NULL,
         `FileDeleteState` int(11) DEFAULT NULL,
          PRIMARY KEY (`WorkunitId`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
-    else
-        echo "Sorry this function is only available in interactive mode"
-        exit 1
-    fi
 }
 
 #----------> Tidy <-------------------------------------------------------------
@@ -365,6 +354,12 @@ test_mysql () {
 
 }
 
+#----------> Error trap <------------------------------------------------------
+#
+#  Function to test for return value and exit on non-zero value
+#
+#------------------------------------------------------------------------------
+
 die () {
 
     echo $1
@@ -402,18 +397,14 @@ show_usage () {
   echo                  "       does not load the data into a database but merely"
   echo                  "       saves the output to the default output file."
   echo 			" -s    Shows this usage statement"
-  echo 			" -i    Sets interactive mode" 
-  echo 			" -b    Sets batch mode" 
   echo 
-  echo 		"  (NOTE: PREVIEW and BATCH options are mutually exclusive!)"
   echo
 }
 
 #----------> Main execution <---------------------------------------------------
 #
-#  Processes commandline arguments testing for interactive mode or batch mode
-#  operation and also executes the function or set of functions required for
-#  the desired task.
+#  Processes commandline arguments and also executes the function or set of 
+#  functions required for the desired task.
 #
 #-------------------------------------------------------------------------------
 
@@ -423,33 +414,25 @@ show_usage () {
 while getopts 'gibeld:cst:' action; do
 case "${action}" in
 
-	   g) get_results_count
+	   g) get_results_count || die
 	      ;;
-    	   e) print_env
+    	   e) print_env || die
 	      ;;
-    	   t) TABLE="${OPTARG}"
-              echo $TABLE
-              create_table
+    	   t) create_table || die
  	      ;;
-       	   l)
-	      retrieve_full_data || die
+       	   l) retrieve_full_data || die
 	      de_json || die
 	      create_load || die
 	      test_mysql || die
 	      archive_results || die
 	      ;;
-	   c)
-	      retrieve_full_data
-	      de_json
-	      create_load
+	   c) retrieve_full_data || die
+	      de_json || die
+	      create_load || die
 	      ;;
-	   s) show_usage
+	   s) show_usage || die
 	      ;;
-           i) interactive=true
-              ;;
-           b) batch=true
-              ;;
-	   *) show_usage
+	   *) show_usage || die
 	      exit 1
    	      ;;
 esac
