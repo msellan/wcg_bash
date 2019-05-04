@@ -23,14 +23,14 @@ Next, you need to have access to a MySQL database. The script has a function tha
 
 Make sure the script itself is executable with a <code> chmod 755 wcg_api_new.sh</code> or 750 or 700 based on your preferences.  Execute the script by running it on the command line or by calling in through 'cron' if you want to run it on a schedule.
 
-You can also use the script to simply generate a CSV file and not load the contents to a database. Specify "-createcsv" at runtime in either interactive or batch mode and the output file will be a CSV file instead of a SQL load script.
+You can also use the script to simply generate a CSV file and not load the contents to a database. Specify "-c" at runtime to merely create a CSV file as the output.  If you want to load data into your MySQL database then specify "-l" (for load) as an option.
 
 
 <h2>Function descriptions</h2>
 
 <h3>get_results_count</h3>
 
-This is a single call to the API that retrieves the number of workunits to download. It is not used directly by the script but can be called at runtime with "-getcounts" in interactive mode only.
+This is a single call to the API that retrieves the number of workunits to download. It is not used directly by the script but can be called at runtime with the "-g" option at runtime.
 
 <h3>retrieve_full_data</h3>
 
@@ -46,7 +46,7 @@ The <code>create_load</code> does most of the heavy lifting by reading all outpu
 
 This function synchronizes the order of the fields adding a placeholder for the one column that gets added dynamically based on workunit status, "Receivedtime".  But mostly it coverts newlines to commas and inserts parentheses and newlines around each record. 
 
-NOTE:  You an derive a plain CSV file instead of a SQL load script by passing "-createcsv" as an argument at runtime.
+NOTE:  You an derive a plain CSV file instead of a SQL load script by setting "-c" as an argument at runtime in place of "-l" which loads the data to MySQL.
 
 <h3>de_json</h3>
 
@@ -58,15 +58,15 @@ The <code>tidy</code> function performs two tasks - 1) it swaps the order of ,) 
 
 <h3>create_table</h3>
 
-The <code>create_table</code> function is not used directly by the script but can be called in interactive mode aand used to create the 'wcg_workunits' table in the 'wcg' MySQL database. It presumes an existing MySQL instance and database.
+The <code>create_table</code> function is not used directly by the script but can be called in interactive mode aand used to create the 'wcg_workunits' table in the 'wcg' MySQL database. It presumes an existing MySQL instance and database. Specify option "-t" at runtime.
 
 <h3>print_env</h3>
 
-<code>print_env</code> is not used by the script but provides a troubleshooting tool to see varibles that are sourced from the wcg_env.sh script. It can be called at runtime with "-showenv" in interactive mode.
+<code>print_env</code> is not used by the script but provides a troubleshooting tool to see varibles that are sourced from the wcg_env.sh script. It can be called at runtime with "-e" option.
 
 <h3>load_data</h3>
 
-The <code>load_data</code> function simply executes the SQL load script built by the <code>create_load</code> function.
+The <code>load_data</code> function simply executes the SQL load script built by the <code>create_load</code> function. Use the "-l" opton to select at runtime/
 
 <h3>archive_results</h3>
 
