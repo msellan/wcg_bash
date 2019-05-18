@@ -38,7 +38,7 @@ This uses 'curl' to retrieve all available work units by using an undocumented f
 
 <h3>parse</h3>
 
-This function uses string manipulation in the shell (not a bashism - this should work in any shell) to parse key/value pairs assigning only the values to a variable called 'value'. The construct is <code>${var#*SubStr}</code> where the beginning of the string up to the substring will be dropped.  In the specific case from the code <code>value="${line#\*:}"</code> the variable $line contains the key/value pair from the JSON separated by ':'  The key (the substring) up to and including the delimiter (':') are dropped leaving the value to be assigned to the variable $value.
+This function uses string manipulation in the shell (this is a bashism - this won't work in any Unix shell) to parse key/value pairs assigning only the values to a variable called 'value'. The construct is <code>${var#*SubStr}</code> where the beginning of the string up to the substring will be dropped.  In the specific case from the code <code>value="${line#\*:}"</code> the variable $line contains the key/value pair from the JSON separated by ':'  The key (the substring) up to and including the delimiter (':') are dropped leaving the value to be assigned to the variable $value.
 
 <h3>create_load</h3>
 
