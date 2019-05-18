@@ -1,4 +1,4 @@
-<img style="float: left; margin: 0px 15px 15px 0px;" src="http://geekworldliving.com/gwl/wp-content/uploads/2019/05/dyn_logo_1.jpg" width="100" />
+<img style="float: left; margin: 0px 15px 15px 0px;" src="http://geekworldliving.com/gwl/wp-content/uploads/2019/05/dyn_logo_1.jpg" width="800" />
 <h1>WCG_bash</h1> 
 
 WCG_bash is a bash script that uses the World Community Grid API to download workunit data and reprocess that data from JSON to CSV and then load the data into a MySQL database. This script presumes the existence of a running instance of MySQL but provides a function to correctly create the table to accomodate the WCG schema. 
